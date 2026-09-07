@@ -19,8 +19,10 @@ def sigmoid(z: ndarray) -> ndarray:
         p: sigmoid(z) with shape (n,). Each p[i] is the sigmoid of z[i].
     '''
     assert z.ndim == 1, 'z must have shape (n,)'
-    # TODO
-    raise NotImplementedError
+    p = 1 / (1 + np.exp(-z))
+    
+    return p
+    #raise NotImplementedError
 
 
 def softmax(Z: ndarray) -> ndarray:
@@ -34,7 +36,10 @@ def softmax(Z: ndarray) -> ndarray:
     '''
     assert Z.ndim == 2, 'Z must have shape (n, k)'
     # TODO
-    raise NotImplementedError
+    Z_shifted = Z - np.max(Z, axis=1, keepdims=True)
+    P = np.exp(Z_shifted) / np.sum(np.exp(Z_shifted), axis=1, keepdims=True)
+    return P
+    # raise NotImplementedError
 
 
 def nll_binary(X: ndarray, w: ndarray, y: ndarray) -> float:
@@ -60,7 +65,11 @@ def nll_binary(X: ndarray, w: ndarray, y: ndarray) -> float:
     # Xaug[:, 0] is vector of 1s
     Xaug = np.concatenate((np.ones((n, 1)), X), axis=1)
     # TODO
-    raise NotImplementedError
+    logits = Xaug @ w
+    p = sigmoid(logits)
+    nll = -np.mean(y * np.log(p) + (1 - y) * np.log(1 - p))
+    return nll
+    #raise NotImplementedError
 
 
 def nll_multiclass(X: ndarray, W: ndarray, Y_onehot: ndarray) -> float:
@@ -87,7 +96,11 @@ def nll_multiclass(X: ndarray, W: ndarray, Y_onehot: ndarray) -> float:
     # Xaug[:, 0] is vector of 1s
     Xaug = np.concatenate((np.ones((n, 1)), X), axis=1)
     # TODO
-    raise NotImplementedError
+    logits = Xaug @ W
+    P = softmax(logits)
+    nll = -np.mean(np.sum(Y_onehot * np.log(P ), axis=1))
+    return nll
+    #raise NotImplementedError
 
 
 ############     Problem 2    ############
@@ -125,10 +138,16 @@ def linreg_ne(
     # Xaug[:, 0] is vector of 1s
     Xaug = np.concatenate((np.ones((n, 1)), X), axis=1)
     t_start = time()
-    # TODO: NE implementation
+    w = None
+    if lmbda is not None:
+        I = np.eye(Xaug.shape[1])
+        w = np.linalg.inv(Xaug.T @ Xaug + lmbda * I) @ Xaug.T @ Y
+    else:
+        w = np.linalg.inv(Xaug.T @ Xaug) @ Xaug.T @ Y
+    
     t_end = time()
-    # return ?, t_end - t_start
-    raise NotImplementedError
+    return w, t_end - t_start
+    #raise NotImplementedError
 
 
 def linreg_gd(
@@ -172,10 +191,14 @@ def linreg_gd(
     Ws = np.zeros((n_iters, d+1, m))  # fixed init for reproducability
     W = np.zeros((d+1, m))
     t_start = time()
-    # TODO: GD implementation
+    for i in range(n_iters):
+        Y_pred = Xaug @ W
+        gradient = (2 / n) * (Xaug.T @ (Y_pred - Y))
+        W -= lr * gradient
+        Ws[i] = W
+        
     t_end = time()
-    # return ?,  t_end - t_start
-    raise NotImplementedError
+    return Ws, t_end - t_start
 
 
 def MSE(Y: ndarray, Yhat: ndarray) -> float:
@@ -191,8 +214,9 @@ def MSE(Y: ndarray, Yhat: ndarray) -> float:
     assert Y.ndim == 2, 'Y must have shape (n, m)'
     assert Y.shape == Yhat.shape, 'Y and Yhave must have same shape'
 
-    # TODO
-    raise NotImplementedError
+    mse = np.mean((Y - Yhat) ** 2)
+    return mse
+    # raise NotImplementedError
 
 
 def plot_runtime_v_feature_dim(
@@ -222,7 +246,9 @@ def plot_runtime_v_feature_dim(
     ax.set_ylabel('Runtime (seconds)')
     ax.grid(visible=True, alpha=0.3)
     # TODO: plot ds v runtimes_ne and ds v runtimes_gd
-    raise NotImplementedError
+    ax.plot(ds, runtimes_ne, label='NE')
+    ax.plot(ds, runtimes_gd, label='GD')
+    #raise NotImplementedError
     ax.legend(loc='upper left')
     fig.tight_layout()
     print(f'Saving {plotname}.png')
@@ -287,11 +313,13 @@ def plot_gd_iters_v_mse(
             ax.set_title(rf'$d = {d}$')
             ax.grid(visible=True, alpha=0.3)
             # TODO: plot NE optimal loss and GD iterations v mse
-            raise NotImplementedError
-            mses_ne_ridge_i = None
-            mses_gd_i = None
+            mses_ne_i = mses_ne[i]
+            mses_ne_ridge_i = mses_ne_ridge[i]
+            mses_gd_i = mses_gd[i]
+            #raise NotImplementedError
+            #mses_ne_ridge_i = None
+            #mses_gd_i = None
             if j == 0:  # if fullscale
-                mses_ne_i = None
                 ax.axhline(mses_ne_i, linestyle='-.', c='tab:green', label='NE')
             ax.axhline(mses_ne_ridge_i, linestyle='-.', c='tab:orange', label='NE Ridge')
             ax.plot(mses_gd_i, c='tab:blue', label='GD')
