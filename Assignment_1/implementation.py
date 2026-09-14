@@ -803,11 +803,11 @@ class SimplePerceptron:
             y: training labels. ndarray of shape (n,)
         '''
         n_samples, n_features = X.shape
-        raise NotImplementedError
+#        raise NotImplementedError
 
         # TODO: Initialize weights from a standard normal distribution and bias to zero
-        self.weights = None
-        self.bias = None
+        self.weights = self.prng.standard_normal(n_features)
+        self.bias = 0.0
 
         # Training loop - implement the perceptron learning algorithm
         for epoch in range(self.max_epochs):
@@ -816,21 +816,21 @@ class SimplePerceptron:
 
             for i in range(n_samples):
                 # TODO: Compute the linear combination (net input)
-                linear_output = None
+                linear_output = X[i] @ self.weights + self.bias
 
                 # Apply step function to get prediction
                 prediction = self._activation_function(linear_output)
 
                 # TODO: Calculate the error and update rule
-                error = None
+                error = y[i] - prediction
 
                 # Only update weights if there's an error (classic perceptron rule)
                 if error != 0:
                     errors += 1
 
                     # TODO: Apply perceptron update rule
-                    self.weights += None
-                    self.bias += None
+                    self.weights += self.learning_rate * error * X[i]
+                    self.bias += self.learning_rate * error
 
             self.training_errors.append(errors)
 
@@ -859,7 +859,7 @@ class SimplePerceptron:
             y: ndarray of predicted labels of shape (n,)
         '''
         # TODO
-        raise NotImplementedError
+        return self._activation_function(X @ self.weights + self.bias)
 
     def get_decision_boundary_params(self) -> dict[str, Any] | None:
         '''
@@ -931,9 +931,8 @@ def create_nonlinear_features(X: ndarray) -> ndarray:
     Returns:
         X_enhanced: Augmented XOR dataset of shape (n, d+1)
     '''
-    # TODO
-    raise NotImplementedError
-
+    X_enhanced = np.column_stack([X, X[:, 0] * X[:, 1]])
+    return X_enhanced
 
 def plot_xor_data(X: ndarray, y: ndarray) -> None:
     '''
