@@ -454,8 +454,10 @@ def run_sgd_improved_analysis(
     w = start_point.copy()
 
     # TODO: simulate noise_scale based on batch size
-    noise_scale = None
-    raise NotImplementedError
+    noise_scale = initial_noise / np.sqrt(batch_size)
+
+
+    #raise NotImplementedError
 
     converged = False
     t_start = time()
@@ -540,13 +542,12 @@ def plot_heatmaps(
     n_trials = losses.shape[-1]
     # TODO: Collect metrics over n_trials
     # resulting ndarrays will have shape (LR, B, NS)
-    raise NotImplementedError
-    losses_mean = None
-    losses_best = None
-    runtimes_mean = None
-    escaped_prob = None
-    conv_iters_mean = None
-    conv_iters_best = None
+    losses_mean = np.mean(losses, axis=-1)
+    losses_best = np.min(losses, axis=-1)
+    runtimes_mean = np.mean(runtimes, axis=-1)
+    escaped_prob = np.mean(escaped, axis=-1)
+    conv_iters_mean = np.mean(conv_iters, axis=-1)
+    conv_iters_best = np.min(conv_iters, axis=-1)
 
     learning_rates_xticks = [str(x) for x in learning_rates]
     batch_sizes_yticks = [str(y) for y in batch_sizes]
@@ -678,8 +679,34 @@ def multi_modal_loss(w: ndarray) -> float:
     Returns:
         L: total loss
     '''
-    # TODO
-    raise NotImplementedError
+    diff1 = w - np.array([1.5, 1.5])
+    norm_sq1 = -(np.sum(diff1**2))/.2
+    L_local1 = -2.0 * np.exp(norm_sq1)
+    
+    # 2. Component L_local2 centered at [1.5, -1.5]
+    diff2 = w - np.array([1.5, -1.5])
+    norm_sq2 = -(np.sum(diff2**2))/.2
+    L_local2 = -1.0 * np.exp(norm_sq2 )
+    
+    # 3. Component L_local3 centered at [2.0, -2.0]
+    diff3 = w - np.array([2.0, -2.0])
+    norm_sq3 = -(np.sum(diff3**2))/.2
+    L_local3 = -2.0 * np.exp(norm_sq3 )
+    
+    # 4. Component L_global centered at [-1.5, -1.5] (w + [1.5, 1.5] is w - [-1.5, -1.5])
+    diff_global = w + np.array([1.5, 1.5])
+    norm_sq_global = -(np.sum(diff_global**2))/1.5
+    L_global = -3.5 * np.exp(norm_sq_global)
+    
+    # 5. Component L_saddle centered at [0, 0]
+    norm_sq_saddle = -(np.sum(w**2))/0.6
+    L_saddle = 0.9 * (w[0]**2 - w[1]**2) * np.exp(norm_sq_saddle)
+    
+    # Total loss
+    L = L_global + L_saddle + L_local1 + L_local2 + L_local3
+    return L
+    
+
 
 
 def multi_modal_grad_components(w: ndarray) -> tuple[ndarray, ndarray]:
@@ -695,8 +722,29 @@ def multi_modal_grad_components(w: ndarray) -> tuple[ndarray, ndarray]:
         grad_local: ndarray of shape (2,) of floats for local grad
         grad_global: ndarray of shape (2,) of floats for global grad
     '''
-    # TODO
-    raise NotImplementedError
+    diff1 = w - np.array([1.5, 1.5])
+    norm_sq1 = -(np.sum(diff1**2))/.2
+    L_local1 = -2.0 * np.exp(norm_sq1)
+    local1_grad = L_local1* (-2.0*diff1/.2)
+
+    diff2 = w - np.array([1.5, -1.5])
+    norm_sq2 = -(np.sum(diff2**2))/.2
+    L_local2 = -1.0 * np.exp(norm_sq2 )
+    local2_grad =  L_local2*(-2.0*diff2/.2)
+
+    diff3 = w - np.array([2.0, -2.0])
+    norm_sq3 = -(np.sum(diff3**2))/.2
+    L_local3 = -2.0 * np.exp(norm_sq3 )
+    local3_grad = L_local3*(-2.0*diff3/.2)
+
+    diff_global = w + np.array([1.5, 1.5])
+    norm_sq_global = -(np.sum(diff_global**2))/1.5
+    L_global = -3.5 * np.exp(norm_sq_global)
+    global_grad = -4/3 *L_global*diff_global
+
+    local_grad = local1_grad + local2_grad + local3_grad
+    return local_grad, global_grad
+
 
 
 ############     Problem 4    ############
