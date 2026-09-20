@@ -7,11 +7,11 @@ Submit `VGGNet.py`, `NiN.py`, `GoogLeNet.py`, `ResNet.py`, `transfer_learning.py
 | Component | Points |
 | --- | ---: |
 | VGGBlock and VGGNet | 15 |
-| NiNBlock and NiN | 15 |
+| NiNBlock and NiN | 15 | - 9/20
 | InceptionBlock and GoogLeNet | 15 |
-| BasicBlock and ResNet | 15 |
+| BasicBlock and ResNet | 15 |- 9/27
 | Transfer learning and fine-tuning | 20 |
 | Depthwise separable convolution | 5 |
 | Inverted residual block | 5 |
-| MobileNetV2 | 10 |
+| MobileNetV2 | 10 |- 10/4
 | **Total** | **100** |
