@@ -773,9 +773,9 @@ def main() -> None:
 #    test_GoogLeNet(GoogLeNet.GoogLeNet, accelerator, train_loader_150, val_loader_150, num_classes)
     test_ResNet(ResNet.ResNet, accelerator, train_loader_150, val_loader_150, num_classes)
 #    test_transfer_learning(transfer_learning, accelerator, train_loader_150, val_loader_150, num_classes)
-    train_loader_224, val_loader_224 = make_loaders(base_ds, train_idx, val_idx, seed = seed, batch_size = batch_size, num_workers = num_workers, image_size = 224, train_aug = "random_resized_crop")
-    MobileNet = import_module("MobileNet")
-    test_assignment_extension(MobileNet, accelerator, train_loader_224, val_loader_224, num_classes)
+#    train_loader_224, val_loader_224 = make_loaders(base_ds, train_idx, val_idx, seed = seed, batch_size = batch_size, num_workers = num_workers, image_size = 224, train_aug = "random_resized_crop")
+#    MobileNet = import_module("MobileNet")
+#    test_assignment_extension(MobileNet, accelerator, train_loader_224, val_loader_224, num_classes)
 
 
 if __name__ == '__main__':
