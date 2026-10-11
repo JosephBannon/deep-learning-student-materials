@@ -21,12 +21,9 @@ class VGGBlock(nn.Module):
         # and the widths of the input and output tensors are the same.
         # Each convolution must have no bias.
         # Perform ReLU in place.
-        super().__init__()
-        layers = []
-        for i in range(num_convs):
+        for _ in range(num_convs):
             # First conv changes channels, rest maintain
-            in_channels = in_channels_to_be_modified if i == 0 else out_channels
-            layers.append(nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, bias=False))
+            layers.append(nn.Conv2d(in_channels_to_be_modified, out_channels, kernel_size=3, padding=1, bias=False))
             layers.append(nn.BatchNorm2d(out_channels))
             layers.append(nn.ReLU(inplace=True))
             in_channels_to_be_modified = out_channels  # Update for next iteration
@@ -34,17 +31,17 @@ class VGGBlock(nn.Module):
         # TODO: Add to the list of layers 2x2 2D max pooling.
         # The output tensor of max pooling has shape
         # (number of images in batch, number of output channels, floor(height of input tensor / 2), floor(width of input tensor) / 2)).
-        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
 
 
         # TODO: Add layers to an object of type Sequential.
         # Assign that object to an instance attribute called sequential.
-        self.convs = nn.Sequential(*layers)
+        self.sequential = nn.Sequential(*layers)
 
 
     def forward(self, x):
         # TODO: Return the output of passing the provided input to sequential.
-        return self.pool(self.convs(x))
+        return self.sequential(x)
 
 class VGGNet(nn.Module):
 

@@ -47,7 +47,7 @@ def get_pretrained_model(model_name='resnet18', num_classes=18, feature_extract=
             for param in model.classifier.parameters():
                 param.requires_grad = False
 
-        layer_6 = model.classifier[6]
+        layer_6 = cast(nn.Linear, model.classifier[6])
 
         in_features = layer_6.in_features
         model.classifier[6] = nn.Linear(in_features=in_features, out_features=num_classes)
@@ -72,7 +72,7 @@ def get_pretrained_model(model_name='resnet18', num_classes=18, feature_extract=
             for param in model.parameters():
                 param.requires_grad = False
 
-        layer_1 = model.classifier[1]
+        layer_1 = cast(nn.Linear, model.classifier[1])
         in_features = layer_1.in_features
         model.classifier[1] = nn.Linear(in_features=in_features, out_features=num_classes)
 
@@ -80,7 +80,7 @@ def get_pretrained_model(model_name='resnet18', num_classes=18, feature_extract=
     # TODO: Otherwise,
     #    raise a value error with a message of "Model {model name} is unsupported.".
     else:
-        raise ValueError(f"Unsupported model name: {model_name}")
+        raise ValueError(f"Model {model_name} is unsupported.")
     
     # TODO: Return the model.
     return model

@@ -213,7 +213,7 @@ class MobileNet(nn.Module):
                 nn.init.constant_(module.weight, 1)
                 nn.init.constant_(module.bias, 0)
             elif isinstance(module, nn.Linear):
-                nn.init.normal_(module.weight, 0, 0.01)
+                nn.init.normal_(module.weight)
                 nn.init.constant_(module.bias, 0)
 
 

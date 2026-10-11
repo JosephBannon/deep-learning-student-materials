@@ -34,11 +34,10 @@ class BasicBlock(nn.Module):
         # The convolution must have a number of input channels equal to the provided number of input channels,
         # a number of output channels equal to the provided number of output channels, stride equal to the provided stride,
         # and no bias.
-        if in_channels == out_channels and stride == 1:
-            self.skip = nn.Identity()  # Perfect identity
-        else:
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_channels != out_channels:
             # 1×1 projection to match dimensions
-            self.skip = nn.Sequential(
+            self.shortcut = nn.Sequential(
                 nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride, bias=False),
                 nn.BatchNorm2d(out_channels)
             )
@@ -63,7 +62,7 @@ class BasicBlock(nn.Module):
 
         # TODO: Assign to intermediate the output of adding intermediate and the output of passing the provided input
         # through the shortcut.
-        intermediate = self.skip(x) + intermediate
+        intermediate = intermediate + self.shortcut(x)
 
         # TODO: Return the output of passing intermediate through ReLU.
         return self.relu(intermediate)
