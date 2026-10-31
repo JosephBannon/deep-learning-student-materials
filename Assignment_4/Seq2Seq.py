@@ -19,7 +19,10 @@ class Seq2Seq(nn.Module):
 
         # TODO: Assign to local variables `sequence_of_output_features` and `tensor_with_final_hidden_states`
         # the output of passing the provided source and the provided list of lengths to the encoder.
-        tensor_with_final_hidden_states = self.encoder(src, src_lengths)
+        sequence_of_output_features, tensor_with_final_hidden_states = self.encoder(src, src_lengths)
+
+        PAD_IDX = 0
+        src_mask = (src != PAD_IDX)
 
         SOS_IDX = 1
         input = torch.full((batch_size,), SOS_IDX, dtype=torch.long, device=self.device)
@@ -27,7 +30,7 @@ class Seq2Seq(nn.Module):
 
             # TODO: Assign to local variables `tensor_of_logits`, `tensor_with_final_hidden_states`, and a placeholder
             # the output passing the input, tensor with final hidden states, sequence of output features, and source mask to the decoder.
-            tensor_of_logits, tensor_with_final_hidden_states = self.decoder(input, tensor_with_final_hidden_states)
+            tensor_of_logits, tensor_with_final_hidden_states, _ = self.decoder(input, tensor_with_final_hidden_states, sequence_of_output_features, src_mask)
 
             tensor_of_logits_for_many_tokens[:, t, :] = tensor_of_logits
             teacher_force = random.random() < teacher_forcing_ratio

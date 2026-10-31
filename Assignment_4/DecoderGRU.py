@@ -21,7 +21,7 @@ class DecoderGRU(nn.Module):
         self.GRU = nn.GRU(emb_dim, hid_dim, n_layers, batch_first=True, dropout=tmp_dropout)
 
         # TODO: Assign to instance attribute attention an object of type Attention.
-        self.attention = Attention(hid_dim)
+        self.attention = Attention()
 
         # TODO: Assign to instance attribute `linear_layer` a linear layer
         # with a number of input features equal to 2 times the provided hidden dimension and
